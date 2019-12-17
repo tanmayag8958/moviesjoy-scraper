@@ -1,0 +1,60 @@
+# serverless deploy --aws-profile tanmay
+# serverless invoke -f moviesjoyScrape --aws-profile jaswal 
+service: moviesjoy-scraper
+
+frameworkVersion: ">=1.1.0 <2.0.0"
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: dev
+  region: us-east-1
+  #profile: tanmay
+  environment:
+    DYNAMODB_TABLE_MOVIESJOY: 'moviesjoy'
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: "*"
+
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: "*"
+
+    - Effect: Allow
+      Action:
+        - ses:*
+      Resource: "*"
+
+package:
+  artifact: package.zip
+
+functions:
+  moviesjoyScrape:
+    handler: handler.scrape
+    events:
+      - http:
+          path: scrape
+          method: post
+          cors: true
+
+
+resources:
+  Resources:
+
+    moviesjoyDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: contentName
+            AttributeType: S
+        KeySchema:
+          - AttributeName: contentName
+            KeyType: HASH 
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_TABLE_MOVIESJOY}
