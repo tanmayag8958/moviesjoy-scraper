@@ -19,6 +19,7 @@ def gettingLink(completeContent):
         oneDownContent = ""
         for j in downPage:
             oneDownContent += "<a href='" + str(j["href"]) + "'><button class='btn btn-primary'>" + str(j.get_text().strip()) + "</button>"
+            # print("j : ",j)
             # oneDownContent["downLink"].append(j["href"])
 
         downContent.append(oneDownContent)
@@ -32,6 +33,7 @@ def deal_scrape():
     completeContent = []
 
     homeContent = content.select('.bw_thumb_title')
+    # print("homeContent  :",homeContent)
 
     for i in range(len(homeContent)):
         homeContent[i].select('.bw_thumb')[0].find('a', href=True)
@@ -42,8 +44,10 @@ def deal_scrape():
         }
 
         completeContent.append(oneThumb)
-
+    
+    # print("completeContent  :",completeContent)
     downloadLink = gettingLink(completeContent)
+    # print("downloadLink  :",downloadLink)
 
     return completeContent, downloadLink
 
@@ -60,7 +64,7 @@ def deal_scrape():
 
 def scrape(event, context):
     completeContent, downloadLink = deal_scrape()
-    print(completeContent)
+    # print("completeContent scrape  : ",completeContent)
     table = boto3.resource('dynamodb').Table('moviesjoy')
     newMovies = []
     newMoviesMail = """
@@ -169,7 +173,7 @@ img {
             
         response = client.send_email(
             Destination={
-                'ToAddresses': [destination,'sneheelshivam@gmail.com', "shaurya96gairola@gmail.com","rambospartan72@gmail.com"],
+                'ToAddresses': [destination,'sneheelshivam@gmail.com', "shaurya96gairola@gmail.com","shubhamjaswal772@gmail.com"],
                 },
             Message={
                 'Body': {
